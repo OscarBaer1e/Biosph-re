@@ -94,7 +94,14 @@ nav a:hover {
     animation: fadeIn 0.8s ease forwards;
 }
 
-.section-initial.hidden,
+.section-projects {
+    display: none;
+}
+
+.section-initial.hidden {
+    animation: fadeOut 0.8s ease forwards;
+}
+
 .section-projects.hidden {
     animation: fadeOut 0.8s ease forwards;
 }

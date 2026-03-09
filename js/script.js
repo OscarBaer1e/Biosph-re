@@ -89,7 +89,7 @@ function createChart(container, projectName, data, chartType, title) {
             },
             animation: {
                 duration: 1500,
-                easing: 'easeOutQuart'
+                easing: 'easeOutQuad'
             },
             elements: {
                 bar: {
@@ -128,22 +128,22 @@ function displaySingleChart(projectName, data, chartIndex) {
     const chart = createChart(chartWrapper, projectName, dataForChart, chartTypes[chartIndex % chartTypes.length], key);
     currentCharts.push(chart);
 
-    const navContainer = document.createElement('div');
-    navContainer.classList.add('chart-nav-container');
-    chartContainer.appendChild(navContainer);
-
     const leftButton = document.createElement('button');
+    leftButton.type = 'button';
     leftButton.classList.add('chart-nav', 'left-button');
-    leftButton.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+    leftButton.setAttribute('aria-label', 'Graphique précédent');
+    leftButton.innerHTML = '<i class="fa-solid fa-chevron-left" aria-hidden="true"></i>';
     leftButton.onclick = () => changeChart(-1, projectName, data);
 
     const rightButton = document.createElement('button');
+    rightButton.type = 'button';
     rightButton.classList.add('chart-nav', 'right-button');
-    rightButton.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+    rightButton.setAttribute('aria-label', 'Graphique suivant');
+    rightButton.innerHTML = '<i class="fa-solid fa-chevron-right" aria-hidden="true"></i>';
     rightButton.onclick = () => changeChart(1, projectName, data);
 
-    navContainer.appendChild(leftButton);
-    navContainer.appendChild(rightButton);
+    chartContainer.appendChild(leftButton);
+    chartContainer.appendChild(rightButton);
 
     chartContainer.style.display = 'flex';
 }
@@ -177,17 +177,17 @@ if (startButtonInitial) {
 
 if (backArrow) {
     backArrow.addEventListener('click', () => {
+        currentCharts.forEach(chart => chart.destroy());
+        currentCharts = [];
+        if (chartContainer) {
+            chartContainer.innerHTML = '';
+            chartContainer.style.display = 'none';
+        }
         switchSection(sectionProjects, sectionInitial);
         projectItems.forEach((item) => {
             item.style.opacity = '0';
             item.style.transform = 'translateY(20px)';
         });
-        if (chartContainer) {
-            chartContainer.innerHTML = '';
-            chartContainer.style.display = 'none';
-        }
-        currentCharts.forEach(chart => chart.destroy());
-        currentCharts = [];
         if (chartTitle) chartTitle.textContent = 'Biosphère';
     });
 }
