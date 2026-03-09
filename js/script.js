@@ -89,7 +89,7 @@ function createChart(container, projectName, data, chartType, title) {
             },
             animation: {
                 duration: 1500,
-                easing: 'easeOutQuad'
+                easing: 'easeOutQuart'
             },
             elements: {
                 bar: {
@@ -113,9 +113,11 @@ function displaySingleChart(projectName, data, chartIndex) {
     if (!chartContainer) return;
     if (chartTitle) chartTitle.textContent = projectName;
 
-    chartContainer.innerHTML = '';
-    currentCharts.forEach(chart => chart.destroy());
+    currentCharts.forEach(chart => {
+        try { chart.destroy(); } catch (_) {}
+    });
     currentCharts = [];
+    chartContainer.innerHTML = '';
 
     const chartKeys = Object.keys(data);
     const key = chartKeys[chartIndex];
@@ -127,6 +129,10 @@ function displaySingleChart(projectName, data, chartIndex) {
 
     const chart = createChart(chartWrapper, projectName, dataForChart, chartTypes[chartIndex % chartTypes.length], key);
     currentCharts.push(chart);
+
+    const navContainer = document.createElement('div');
+    navContainer.classList.add('chart-nav-container');
+    chartContainer.appendChild(navContainer);
 
     const leftButton = document.createElement('button');
     leftButton.type = 'button';
@@ -142,8 +148,8 @@ function displaySingleChart(projectName, data, chartIndex) {
     rightButton.innerHTML = '<i class="fa-solid fa-chevron-right" aria-hidden="true"></i>';
     rightButton.onclick = () => changeChart(1, projectName, data);
 
-    chartContainer.appendChild(leftButton);
-    chartContainer.appendChild(rightButton);
+    navContainer.appendChild(leftButton);
+    navContainer.appendChild(rightButton);
 
     chartContainer.style.display = 'flex';
 }
@@ -177,7 +183,9 @@ if (startButtonInitial) {
 
 if (backArrow) {
     backArrow.addEventListener('click', () => {
-        currentCharts.forEach(chart => chart.destroy());
+        currentCharts.forEach(chart => {
+            try { chart.destroy(); } catch (_) {}
+        });
         currentCharts = [];
         if (chartContainer) {
             chartContainer.innerHTML = '';
