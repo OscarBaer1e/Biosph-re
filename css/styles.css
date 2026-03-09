@@ -17,6 +17,15 @@ body {
     color: #1a1a1a;
     text-align: center;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -31,20 +40,32 @@ body {
 header {
     background-color: #000;
     color: #fff;
-    padding: 10px 20px;
+    padding: 12px 24px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .logo-container {
     display: flex;
     align-items: center;
+    justify-content: center;
+    max-width: 100%;
 }
 
 .logo-img {
-    height: 90px;
+    height: 70px;
+    width: auto;
+    max-height: 80px;
     display: block;
+    object-fit: contain;
+}
+
+@media (min-width: 600px) {
+    .logo-img {
+        height: 90px;
+    }
 }
 
 .logo-fallback {
@@ -86,11 +107,15 @@ nav a:hover {
 /* ========== Sections ========== */
 .section-initial,
 .section-projects {
-    height: calc(100vh - 60px);
+    width: 100%;
+    min-height: calc(100vh - 120px);
+    min-height: calc(100dvh - 120px);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 2rem 1.5rem 3rem;
+    box-sizing: border-box;
     animation: fadeIn 0.8s ease forwards;
 }
 
@@ -115,7 +140,7 @@ h1 {
 }
 
 .section-initial__tagline {
-    margin: 0.5rem 0 1.5rem;
+    margin: 0.75rem 0 2rem;
     font-size: clamp(0.95rem, 2.5vw, 1.15rem);
     color: #444;
     font-weight: 400;
@@ -154,7 +179,11 @@ h1 {
     display: flex;
     align-items: center;
     gap: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 900px;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
 }
 
 .back-arrow {
@@ -175,10 +204,13 @@ h1 {
 
 .projects-list {
     display: flex;
-    gap: 20px;
-    margin-top: 30px;
+    gap: 1rem 1.25rem;
+    margin-top: 0;
+    padding: 0 1rem;
     flex-wrap: wrap;
     justify-content: center;
+    max-width: 900px;
+    box-sizing: border-box;
 }
 
 .project-item {
@@ -263,8 +295,8 @@ h1 {
     align-items: center;
     width: 100%;
     max-width: 900px;
-    margin: -260px auto 50px;
-    padding: 0 1rem 50px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
     box-sizing: border-box;
 }
 
@@ -276,12 +308,13 @@ h1 {
 .chart-wrapper {
     width: 100%;
     max-width: 800px;
-    height: 400px;
+    height: 380px;
+    margin: 0 auto;
 }
 
 @media (min-width: 900px) {
     .chart-wrapper {
-        height: 500px;
+        height: 480px;
     }
 }
 
@@ -339,32 +372,52 @@ h1 {
 footer {
     background-color: #000;
     color: #fff;
-    padding: 40px 20px;
+    padding: 2.5rem 1.5rem 2rem;
     font-family: 'Poppins', sans-serif;
+    flex-shrink: 0;
+    margin-top: auto;
 }
 
 .footer-container {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: flex-start;
-    max-width: 1200px;
+    gap: 2.5rem 3rem;
+    max-width: 1000px;
     margin: 0 auto;
+    text-align: left;
+}
+
+.footer-logo {
+    flex-shrink: 0;
 }
 
 .footer-logo img {
-    max-width: 200px;
+    display: block;
+    max-width: 160px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
 }
 
 .footer-content {
     display: flex;
-    gap: 60px;
+    flex-wrap: wrap;
+    gap: 2rem 3rem;
+    justify-content: center;
+}
+
+.footer-column {
+    min-width: 140px;
 }
 
 .footer-column h3 {
-    margin-bottom: 15px;
-    font-size: 1.2rem;
+    margin: 0 0 0.75rem;
+    font-size: 0.9rem;
     text-transform: uppercase;
     font-weight: 600;
+    letter-spacing: 0.05em;
 }
 
 .footer-column ul {
@@ -374,13 +427,14 @@ footer {
 }
 
 .footer-column li {
-    margin-bottom: 10px;
-    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
 }
 
 .footer-line {
     border: none;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
-    margin-top: 20px;
+    margin: 1.5rem auto 0;
+    max-width: 1000px;
     width: 100%;
 }
