@@ -88,9 +88,8 @@ function createChart(container, projectName, data, chartType, title) {
                 }
             },
             animation: {
-                duration: 2000,
-                easing: 'easeInOutElastic',
-                onComplete: () => console.log('Animation terminée')
+                duration: 1500,
+                easing: 'easeOutQuart'
             },
             elements: {
                 bar: {
@@ -193,16 +192,24 @@ if (backArrow) {
     });
 }
 
+function handleProjectSelect(item) {
+    const projectName = item.textContent.trim();
+    const data = chartData[projectName];
+    if (data) {
+        currentChartIndex = 0;
+        displaySingleChart(projectName, data, currentChartIndex);
+    } else if (chartContainer) {
+        chartContainer.innerHTML = '<p>Aucune donnée disponible pour ce projet.</p>';
+        chartContainer.style.display = 'flex';
+    }
+}
+
 projectItems.forEach(item => {
-    item.addEventListener('click', () => {
-        const projectName = item.textContent.trim();
-        const data = chartData[projectName];
-        if (data) {
-            currentChartIndex = 0;
-            displaySingleChart(projectName, data, currentChartIndex);
-        } else if (chartContainer) {
-            chartContainer.innerHTML = '<p>Aucune donnée disponible pour ce projet.</p>';
-            chartContainer.style.display = 'flex';
+    item.addEventListener('click', () => handleProjectSelect(item));
+    item.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleProjectSelect(item);
         }
     });
 });

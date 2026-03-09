@@ -1,8 +1,8 @@
 # Images
 
-Placez ici les visuels du projet :
+Ce dossier contient les visuels du site :
 
-- **logo.png** — Logo Biosphère (ex. Pink Cute Simple Flower Shop Circle Logo)
+- **logo.png** — Logo Biosphère (header)
 - **univeiffel.png** — Logo Université Gustave Eiffel (footer)
 
-Ces fichiers sont référencés dans `index.html`. En leur absence, les images ne s’afficheront pas.
+Ils peuvent être recopiés depuis `SAE 301-303/PHOTO/` si besoin. En cas d'image manquante, un fallback texte s'affiche pour le logo.

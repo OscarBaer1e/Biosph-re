@@ -13,9 +13,18 @@
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
-    background-color: #fff;
-    color: #000;
+    background-color: #fafafa;
+    color: #1a1a1a;
     text-align: center;
+    min-height: 100vh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 /* ========== Header ========== */
@@ -35,6 +44,18 @@ header {
 
 .logo-img {
     height: 90px;
+    display: block;
+}
+
+.logo-fallback {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+}
+
+.logo-fallback--hidden {
+    display: none;
 }
 
 nav a {
@@ -81,8 +102,16 @@ nav a:hover {
 h1 {
     font-family: 'Poppins', sans-serif;
     font-weight: 700;
-    font-size: 5rem;
+    font-size: clamp(2.2rem, 8vw, 5rem);
     margin: 0;
+    line-height: 1.1;
+}
+
+.section-initial__tagline {
+    margin: 0.5rem 0 1.5rem;
+    font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+    color: #444;
+    font-weight: 400;
 }
 
 /* ========== Bouton principal ========== */
@@ -104,6 +133,13 @@ h1 {
     background-color: #1ED17E;
     box-shadow: 0 0 25px rgba(32, 238, 143, 0.6);
     transform: scale(1.05);
+}
+
+.start-button:focus-visible,
+.back-arrow:focus-visible,
+.project-item:focus-visible {
+    outline: 2px solid #00c364;
+    outline-offset: 3px;
 }
 
 /* ========== Section projets ========== */
@@ -164,25 +200,28 @@ h1 {
 .project-item::after {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: -60px;
+    bottom: 100%;
     left: 50%;
-    transform: translateX(-50%);
-    background-color: #e4f9e4;
-    color: #333;
-    padding: 10px;
+    transform: translateX(-50%) translateY(-8px);
+    background-color: #1a1a1a;
+    color: #fff;
+    padding: 10px 14px;
     border-radius: 8px;
-    font-size: 0.9rem;
-    white-space: nowrap;
+    font-size: 0.85rem;
+    max-width: 280px;
+    white-space: normal;
+    text-align: center;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     z-index: 10;
 }
 
-.project-item:hover::after {
+.project-item:hover::after,
+.project-item:focus-visible::after {
     opacity: 1;
-    transform: translateX(-50%) translateY(-10px);
+    transform: translateX(-50%) translateY(-12px);
 }
 
 /* ========== Animations ========== */
@@ -215,9 +254,11 @@ h1 {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    max-width: 60%;
+    width: 100%;
+    max-width: 900px;
     margin: -260px auto 50px;
-    padding-bottom: 50px;
+    padding: 0 1rem 50px;
+    box-sizing: border-box;
 }
 
 .chart-container-bottom canvas {
@@ -226,8 +267,15 @@ h1 {
 }
 
 .chart-wrapper {
-    width: 800px;
-    height: 500px;
+    width: 100%;
+    max-width: 800px;
+    height: 400px;
+}
+
+@media (min-width: 900px) {
+    .chart-wrapper {
+        height: 500px;
+    }
 }
 
 .chart-nav {
@@ -253,11 +301,16 @@ h1 {
 }
 
 .chart-nav.left-button {
-    left: -50px;
+    left: 0;
 }
 
 .chart-nav.right-button {
-    right: -50px;
+    right: 0;
+}
+
+@media (min-width: 700px) {
+    .chart-nav.left-button { left: -50px; }
+    .chart-nav.right-button { right: -50px; }
 }
 
 #closeChart {
