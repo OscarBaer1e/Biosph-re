@@ -1,6 +1,6 @@
 /**
- * Biosphère — Visualisation des projets de biocontrôle
- * Accessibilité : skip link, gestion du focus, annonces live, données en tableau
+ * Biosphère - Visualisation des projets de biocontrôle
+ * Gestion des sections, projets et graphiques Chart.js
  */
 
 const startButtonInitial = document.querySelector('.section-initial .start-button');
@@ -8,24 +8,13 @@ const backArrow = document.querySelector('.section-projects .back-arrow');
 const sectionInitial = document.querySelector('.section-initial');
 const sectionProjects = document.querySelector('.section-projects');
 const projectItems = document.querySelectorAll('.projects-list .project-item');
-const chartSection = document.getElementById('chart-section');
-const chartWrapper = chartSection?.querySelector('.chart-wrapper');
+const chartContainer = document.querySelector('.chart-container-bottom');
 const chartTitle = document.getElementById('project-title');
-const chartAnnouncer = document.getElementById('chart-announcer');
-const chartNavLabel = document.getElementById('chart-nav-label');
-const chartDataContent = document.getElementById('chart-data-content');
-const leftNavBtn = chartSection?.querySelector('.chart-nav.left-button');
-const rightNavBtn = chartSection?.querySelector('.chart-nav.right-button');
-const mainContent = document.getElementById('main-content');
 
 let currentCharts = [];
 let currentChartIndex = 0;
-let currentProjectName = '';
-let currentProjectData = null;
-let lastFocusedProject = null;
 
 const chartTypes = ['bar', 'doughnut', 'pie'];
-const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const chartData = {
     "4SYSLEG": {
@@ -55,45 +44,11 @@ const chartData = {
     }
 };
 
-function getProjectNameFromItem(item) {
-    return item.getAttribute('data-project') || item.querySelector('.project-item__name')?.textContent?.trim() || item.textContent.trim();
-}
-
-function announceLive(element, text) {
-    if (!element) return;
-    element.textContent = '';
-    element.setAttribute('aria-live', 'polite');
-    requestAnimationFrame(() => {
-        element.textContent = text;
-    });
-}
-
-function buildAccessibleTable(data, title) {
-    const labels = Object.keys(data);
-    const values = Object.values(data);
-    let html = '<table><caption class="sr-only">' + escapeHtml(title) + '</caption><thead><tr><th scope="col">Catégorie</th><th scope="col">Effectif</th></tr></thead><tbody>';
-    labels.forEach((label, i) => {
-        html += '<tr><td>' + escapeHtml(label) + '</td><td>' + values[i] + '</td></tr>';
-    });
-    html += '</tbody></table>';
-    return html;
-}
-
-function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-function createChart(container, data, chartType, title) {
-    if (!container) return null;
-    container.innerHTML = '';
+function createChart(container, projectName, data, chartType, title) {
     const canvas = document.createElement('canvas');
-    canvas.setAttribute('aria-hidden', 'true');
     container.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
-    const duration = prefersReducedMotion() ? 0 : 1200;
     const chart = new Chart(ctx, {
         type: chartType,
         data: {
@@ -102,96 +57,95 @@ function createChart(container, data, chartType, title) {
                 label: title,
                 data: Object.values(data),
                 backgroundColor: [
-                    'rgba(45, 212, 160, 0.7)',
-                    'rgba(124, 58, 237, 0.7)',
-                    'rgba(251, 191, 36, 0.7)',
-                    'rgba(34, 211, 238, 0.7)',
-                    'rgba(248, 113, 113, 0.7)',
-                    'rgba(167, 139, 250, 0.7)'
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)'
                 ],
-                borderColor: 'rgba(255, 255, 255, 0.2)',
+                borderColor: 'rgba(255, 255, 255, 0.9)',
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: { duration: duration },
             plugins: {
                 legend: {
                     display: true,
                     position: 'top',
                     labels: {
-                        font: { size: 13, family: "'DM Sans', sans-serif" },
-                        color: 'rgba(232, 237, 234, 0.9)',
-                        padding: 12
+                        font: { size: 14, family: "'Poppins', sans-serif", weight: 'bold' },
+                        color: 'rgba(0,0,0,0.7)'
                     }
                 },
                 title: {
                     display: true,
                     text: title,
-                    font: { size: 16, family: "'Fraunces', serif" },
-                    color: 'rgba(232, 237, 234, 0.95)'
+                    font: { size: 18, family: "'Poppins', sans-serif", weight: 'bold' },
+                    color: '#333'
                 }
             },
-            scales: chartType === 'bar' ? {
-                y: { ticks: { color: 'rgba(232, 237, 234, 0.7)' } },
-                x: { ticks: { color: 'rgba(232, 237, 234, 0.7)' } }
-            } : {}
+            animation: {
+                duration: 1500,
+                easing: 'easeOutQuart'
+            },
+            elements: {
+                bar: {
+                    backgroundColor: (context) => {
+                        const value = context.dataset.data[context.dataIndex];
+                        return value > 20 ? 'rgba(75, 192, 192, 0.8)' : 'rgba(255, 99, 132, 0.8)';
+                    },
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    hoverBackgroundColor: 'rgba(255, 206, 86, 1)',
+                    hoverBorderColor: 'rgba(255, 159, 64, 1)'
+                }
+            }
         }
     });
+
     return chart;
 }
 
 function displaySingleChart(projectName, data, chartIndex) {
-    if (!chartSection || !chartWrapper) return;
+    if (!chartContainer) return;
+    if (chartTitle) chartTitle.textContent = projectName;
 
+    chartContainer.innerHTML = '';
     currentCharts.forEach(chart => chart.destroy());
     currentCharts = [];
-    currentProjectName = projectName;
-    currentProjectData = data;
 
     const chartKeys = Object.keys(data);
     const key = chartKeys[chartIndex];
     const dataForChart = data[key];
-    const total = chartKeys.length;
 
-    chartTitle.textContent = projectName;
+    const chartWrapper = document.createElement('div');
+    chartWrapper.classList.add('chart-wrapper');
+    chartContainer.appendChild(chartWrapper);
 
-    const chart = createChart(chartWrapper, dataForChart, chartTypes[chartIndex % chartTypes.length], key);
+    const chart = createChart(chartWrapper, projectName, dataForChart, chartTypes[chartIndex % chartTypes.length], key);
     currentCharts.push(chart);
 
-    if (chartDataContent) {
-        chartDataContent.innerHTML = buildAccessibleTable(dataForChart, key + ' — ' + projectName);
-    }
+    const navContainer = document.createElement('div');
+    navContainer.classList.add('chart-nav-container');
+    chartContainer.appendChild(navContainer);
 
-    const labelText = (chartIndex + 1) + ' / ' + total + ' : ' + key;
-    if (chartNavLabel) chartNavLabel.textContent = (chartIndex + 1) + ' / ' + total;
-    announceLive(chartAnnouncer, 'Graphique ' + (chartIndex + 1) + ' sur ' + total + '. ' + key + '.');
+    const leftButton = document.createElement('button');
+    leftButton.classList.add('chart-nav', 'left-button');
+    leftButton.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+    leftButton.onclick = () => changeChart(-1, projectName, data);
 
-    if (leftNavBtn) {
-        leftNavBtn.onclick = () => changeChart(-1);
-        leftNavBtn.setAttribute('aria-label', 'Graphique précédent : ' + (chartIndex === 0 ? chartKeys[total - 1] : chartKeys[chartIndex - 1]));
-    }
-    if (rightNavBtn) {
-        rightNavBtn.onclick = () => changeChart(1);
-        rightNavBtn.setAttribute('aria-label', 'Graphique suivant : ' + (chartIndex === total - 1 ? chartKeys[0] : chartKeys[chartIndex + 1]));
-    }
+    const rightButton = document.createElement('button');
+    rightButton.classList.add('chart-nav', 'right-button');
+    rightButton.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+    rightButton.onclick = () => changeChart(1, projectName, data);
 
-    chartSection.removeAttribute('hidden');
-    chartSection.style.display = 'flex';
-    chartSection.setAttribute('aria-hidden', 'false');
+    navContainer.appendChild(leftButton);
+    navContainer.appendChild(rightButton);
 
-    requestAnimationFrame(() => {
-        if (leftNavBtn) leftNavBtn.focus();
-    });
-}
-
-function changeChart(direction) {
-    if (!currentProjectData) return;
-    const chartKeys = Object.keys(currentProjectData);
-    currentChartIndex = (currentChartIndex + direction + chartKeys.length) % chartKeys.length;
-    displaySingleChart(currentProjectName, currentProjectData, currentChartIndex);
+    chartContainer.style.display = 'flex';
 }
 
 function switchSection(hideSection, showSection) {
@@ -200,31 +154,13 @@ function switchSection(hideSection, showSection) {
         hideSection.style.display = 'none';
         showSection.style.display = 'flex';
         showSection.classList.remove('hidden');
-    }, prefersReducedMotion() ? 0 : 400);
+    }, 800);
 }
 
-function closeCharts() {
-    if (chartSection) {
-        chartSection.setAttribute('hidden', '');
-        chartSection.style.display = 'none';
-        chartSection.setAttribute('aria-hidden', 'true');
-    }
-    chartWrapper.innerHTML = '';
-    currentCharts.forEach(chart => chart.destroy());
-    currentCharts = [];
-    currentProjectData = null;
-    if (chartTitle) chartTitle.textContent = 'Biosphère';
-    if (chartDataContent) chartDataContent.innerHTML = '';
-    if (lastFocusedProject && typeof lastFocusedProject.focus === 'function') {
-        lastFocusedProject.focus();
-    }
-}
-
-if (document.querySelector('.skip-link')) {
-    document.querySelector('.skip-link').addEventListener('click', (e) => {
-        e.preventDefault();
-        if (mainContent) mainContent.focus();
-    });
+function changeChart(direction, projectName, data) {
+    const chartKeys = Object.keys(data);
+    currentChartIndex = (currentChartIndex + direction + chartKeys.length) % chartKeys.length;
+    displaySingleChart(projectName, data, currentChartIndex);
 }
 
 if (startButtonInitial) {
@@ -235,7 +171,6 @@ if (startButtonInitial) {
                 item.style.opacity = '1';
                 item.style.transform = 'translateY(0)';
             });
-            if (mainContent) mainContent.focus();
         }
     });
 }
@@ -247,27 +182,29 @@ if (backArrow) {
             item.style.opacity = '0';
             item.style.transform = 'translateY(20px)';
         });
-        closeCharts();
-        if (startButtonInitial) startButtonInitial.focus();
+        if (chartContainer) {
+            chartContainer.innerHTML = '';
+            chartContainer.style.display = 'none';
+        }
+        currentCharts.forEach(chart => chart.destroy());
+        currentCharts = [];
+        if (chartTitle) chartTitle.textContent = 'Biosphère';
     });
 }
 
 function handleProjectSelect(item) {
-    const projectName = getProjectNameFromItem(item);
+    const projectName = item.textContent.trim();
     const data = chartData[projectName];
-    lastFocusedProject = item;
     if (data) {
         currentChartIndex = 0;
-        displaySingleChart(projectName, data, 0);
-    } else if (chartSection) {
-        chartSection.removeAttribute('hidden');
-        chartSection.style.display = 'flex';
-        if (chartDataContent) chartDataContent.innerHTML = '<p>Aucune donnée disponible pour ce projet.</p>';
-        announceLive(chartAnnouncer, 'Aucune donnée disponible pour ce projet.');
+        displaySingleChart(projectName, data, currentChartIndex);
+    } else if (chartContainer) {
+        chartContainer.innerHTML = '<p>Aucune donnée disponible pour ce projet.</p>';
+        chartContainer.style.display = 'flex';
     }
 }
 
-projectItems.forEach((item) => {
+projectItems.forEach(item => {
     item.addEventListener('click', () => handleProjectSelect(item));
     item.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
